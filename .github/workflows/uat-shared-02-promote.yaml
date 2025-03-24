@@ -14,8 +14,6 @@ on:
         type: choice
         options:
           - all
-          - webapp
-          - webbff
           - idp
       runner-labels:
         description: 'Runner labels (as JSON string, e.g. ["self-hosted", "build-runner"])'
