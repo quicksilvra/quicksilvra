@@ -36,7 +36,7 @@ services:
       DataProtectionConfiguration__DataProtectionPath: ${Quicksilvra_DataProtectionConfiguration__DataProtectionPath}
       NetworkConfiguration__AuthorityInternalUri: ${Quicksilvra_Uat_AuthorityInternalUri}
       NetworkConfiguration__AuthorityExternalUri: ${Quicksilvra_Uat_AuthorityExternalUri}
-      DuendeIdentityServerLicence: ${DuendeIdentityServerLicence}
+      DuendeIdentityServerLicense: ${DuendeIdentityServerLicense}
     volumes:
       - ${Quicksilvra_DataProtectionConfiguration__DataProtectionPath}:${Quicksilvra_DataProtectionConfiguration__DataProtectionPath}
       - ${Quicksilvra_DataProtectionConfiguration__X509__Path}:${Quicksilvra_DataProtectionConfiguration__X509__Path}:ro
