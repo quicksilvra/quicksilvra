@@ -1,0 +1,20 @@
+﻿FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+WORKDIR /source
+
+COPY src/*.sln .
+
+COPY src/. .
+RUN dotnet restore
+
+
+WORKDIR /source/Quicksilvra.Idp
+RUN dotnet publish -c release -o /app --no-restore  /p:UseAppHost=false
+
+
+# final stage/image
+FROM mcr.microsoft.com/dotnet/aspnet:9.0
+WORKDIR /app
+COPY --from=build /app ./
+
+
+ENTRYPOINT ["dotnet", "Quicksilvra.Idp.dll"] 

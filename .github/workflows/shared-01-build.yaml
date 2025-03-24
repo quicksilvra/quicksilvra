@@ -1,0 +1,110 @@
+name: Shared build
+
+on:
+  workflow_call:
+    inputs:
+      environment-name:
+        required: true
+        type: string
+        description: "Target environment"
+      service-name:
+        required: true
+        type: string
+        description: "Service name as per docker compose naming"
+      image-name:
+        required: true
+        type: string
+        description: "Image name as it is shown from docker ps -a"
+      dockerfile-name:
+        required: true
+        type: string
+        description: "Dockerfile name"
+      runner-labels:
+        required: true
+        type: string
+        description: "Runner labels"
+      timestamp:
+        required: true
+        type: string
+        description: "Timestamp used for naming the package (e.g. 20250320-141530)"
+      build-share:
+        required: true
+        type: string
+        description: "Shared build zone"
+        
+jobs:
+  build-image:
+    name: Build ${{ inputs.service-name }} ${{ inputs.environment-name }} Docker Image
+    runs-on: ${{ fromJson(inputs.runner-labels) }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        
+      - name: Define build variables
+        id: set-vars
+        run: |
+          echo "image-name-with-env=${{ inputs.image-name }}-${{ inputs.environment-name }}" >> $GITHUB_OUTPUT          
+          echo "image-name-with-env-tagged=${{ inputs.image-name }}-${{ inputs.environment-name }}:${{inputs.timestamp}}" >> $GITHUB_OUTPUT
+          echo "tar-name-with-env-tagged=${{ inputs.image-name }}-${{ inputs.environment-name }}-${{inputs.timestamp}}.tar" >> $GITHUB_OUTPUT
+        
+      - name: Build ${{ inputs.service-name }}-${{ inputs.environment-name }}-${{ inputs.timestamp }} image
+        run: |
+          docker build -t ${{ steps.set-vars.outputs.image-name-with-env-tagged }} -f ${{ inputs.environment-name }}/docker/${{ inputs.dockerfile-name }} .
+
+      - name: Clean artifacts folder before preparing new bundle
+        run: |
+          mkdir -p ~/artifacts/${{ inputs.environment-name }}/${{ inputs.service-name }}
+          if [ "$(ls -A ~/artifacts/${{ inputs.environment-name }}/${{ inputs.service-name }} 2>/dev/null)" ]; then
+            rm -f ~/artifacts/${{ inputs.environment-name }}/${{ inputs.service-name }}/*
+          else
+            echo "✅ Folder is already empty, nothing to delete."
+          fi
+
+      - name: Save Docker image as tar archive
+        run: |
+          docker save ${{ steps.set-vars.outputs.image-name-with-env-tagged }} -o ~/artifacts/${{ inputs.environment-name }}/${{ inputs.service-name }}/${{ steps.set-vars.outputs.tar-name-with-env-tagged }} 
+
+      - name: Patch docker-compose.yaml image tag
+        run: |
+          sed -i -E "s|image: ${{ steps.set-vars.outputs.image-name-with-env }}(:[a-zA-Z0-9._-]+)?|image: ${{ steps.set-vars.outputs.image-name-with-env-tagged }}|" ${{ inputs.environment-name }}/docker-compose.yaml
+
+      - name: Copy docker compose into artifacts
+        run: |
+          cp ${{ inputs.environment-name }}/docker-compose.yaml ~/artifacts/${{ inputs.environment-name }}/${{ inputs.service-name }}/
+          
+      - name: Patch runner file
+        run: |
+          sed -i -E "s|%%IMAGE_TAR_UNCOMPRESSED%%|${{ steps.set-vars.outputs.tar-name-with-env-tagged }}|" ${{ inputs.environment-name }}/scripts/runner.sh.model
+          sed -i -E "s|%%servicename%%|${{ inputs.service-name }}|g" ${{ inputs.environment-name }}/scripts/runner.sh.model
+            
+      - name: Copy runner into artifacts
+        run: |
+          cp ${{ inputs.environment-name }}/scripts/runner.sh.model ~/artifacts/${{ inputs.environment-name }}/${{ inputs.service-name }}/runner-${{ inputs.service-name }}.sh
+          chmod +x ~/artifacts/${{ inputs.environment-name }}/${{ inputs.service-name }}/runner-${{ inputs.service-name }}.sh
+
+      - name: Clean compressed folder before compressing package
+        run: |
+          mkdir -p ~/compressed/${{ inputs.environment-name }}/${{ inputs.service-name }}
+          if [ "$(ls -A ~/compressed/${{ inputs.environment-name }}/${{ inputs.service-name }} 2>/dev/null)" ]; then
+            rm -f ~/compressed/${{ inputs.environment-name }}/${{ inputs.service-name }}/*
+          else
+            echo "✅ Folder is already empty, nothing to delete."
+          fi
+          
+      - name: Compress package
+        run: |
+          tar -cJf ~/compressed/${{inputs.environment-name}}/${{inputs.service-name}}/${{ steps.set-vars.outputs.tar-name-with-env-tagged }}.xz -C ~/artifacts/${{inputs.environment-name}}/${{inputs.service-name}}/ .
+
+      - name: Clean shared folder before copying compressed
+        run: |
+          mkdir -p ${{ inputs.build-share }}/${{inputs.environment-name}}/${{inputs.service-name}}
+          if [ "$(ls -A ${{ inputs.build-share }}/${{inputs.environment-name}}/${{inputs.service-name}} 2>/dev/null)" ]; then
+            rm -f ${{ inputs.build-share }}/${{inputs.environment-name}}/${{inputs.service-name}}/*
+          else
+            echo "✅ Folder is already empty, nothing to delete."
+          fi      
+      
+      - name: Copy package to shared
+        run: |
+          cp ~/compressed/${{inputs.environment-name}}/${{inputs.service-name}}/${{ steps.set-vars.outputs.tar-name-with-env-tagged }}.xz ${{ inputs.build-share }}/${{inputs.environment-name}}/${{inputs.service-name}}/

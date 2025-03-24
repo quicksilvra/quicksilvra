@@ -1,0 +1,63 @@
+name: Shared stage
+
+on:
+  workflow_call:
+    inputs:
+      environment-name:
+        required: true
+        type: string
+        description: "Target environment"
+      service-name:
+        required: true
+        type: string
+        description: "Service name as per docker compose naming"
+      image-name:
+        required: true
+        type: string
+        description: "Image name as it is shown from docker ps -a"
+      runner-labels:
+        required: true
+        type: string
+        description: "Runner labels"
+      remote:
+        required: true
+        type: string
+        description: "Remote server"
+      build-share:
+        required: true
+        type: string
+        description: "Shared build zone"
+
+jobs:
+  copy-to-remote:
+    name: Copy build to remote ${{inputs.remote}}
+    runs-on: ${{ fromJson(inputs.runner-labels) }}
+
+    steps:
+
+      - name: Define build variables
+        id: set-vars
+        run: |
+          echo "image-name-with-env=${{ inputs.image-name }}-${{ inputs.environment-name }}" >> $GITHUB_OUTPUT
+
+      - name: Copy ${{ inputs.service-name }} ${{ inputs.environment-name }} package to ${{ inputs.remote }}
+        run: |
+          echo "Cleaning up /opt/deploy-incoming/${{ inputs.service-name }} on ${{ inputs.remote }}"
+          ssh -i ~/.ssh/id_${{ inputs.remote }}_ci ${{ inputs.remote }} "rm -rf /opt/deploy-incoming/${{ inputs.service-name }}/*"    
+          
+          echo "Creating dir /opt/deploy-incoming/${{ inputs.service-name }}"
+          ssh -i ~/.ssh/id_${{ inputs.remote }}_ci ${{ inputs.remote }} "mkdir -p /opt/deploy-incoming/${{ inputs.service-name }}"   
+          
+          echo "Copying compressed to ${{ inputs.remote }}"
+          scp -i ~/.ssh/id_${{ inputs.remote }}_ci ${{ inputs.build-share }}/${{inputs.environment-name}}/${{inputs.service-name}}/${{ steps.set-vars.outputs.image-name-with-env }}*.xz  ${{ inputs.remote }}:/opt/deploy-incoming/${{ inputs.service-name }}/
+
+      - name: Promote ${{ inputs.service-name }} ${{ inputs.environment-name }} on deploy
+        run: |
+          echo "Cleaning up /opt/deploy/${{ inputs.service-name }} on ${{ inputs.remote }}"
+          ssh -i ~/.ssh/id_${{ inputs.remote }}_ci ${{ inputs.remote }} "rm -rf /opt/deploy/${{ inputs.service-name }}/*"    
+          
+          echo "Creating dir /opt/deploy/${{ inputs.service-name }}"
+          ssh -i ~/.ssh/id_${{ inputs.remote }}_ci ${{ inputs.remote }} "mkdir -p /opt/deploy/${{ inputs.service-name }}"   
+          
+          echo "Opening tar.xz in deploy on ${{ inputs.remote }}"
+          ssh -i ~/.ssh/id_${{ inputs.remote }}_ci ${{ inputs.remote }} "tar -xJf /opt/deploy-incoming/${{ inputs.service-name }}/*.xz -C /opt/deploy/${{ inputs.service-name }}/"

@@ -1,0 +1,13 @@
+<Project>
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>disable</ImplicitUsings>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <InvariantGlobalization>true</InvariantGlobalization>
+        <AnalysisMode>AllEnabledByDefault</AnalysisMode>
+        <NeutralLanguage>en</NeutralLanguage>
+        <!-- Suppress CA2007: Do not directly await a Task - warning globally -->
+        <NoWarn>$(NoWarn);CA2007</NoWarn>
+    </PropertyGroup>
+</Project>

@@ -1,0 +1,51 @@
+name: quicksilvra
+
+services:
+  
+  certbot:
+    image: certbot/certbot:latest
+    volumes:
+      - /etc/quicksilvra/certbot/www/:/var/www/certbot/:rw
+      - /etc/quicksilvra/certbot/conf/:/etc/letsencrypt/:rw
+    networks:
+      - quicksilvra-network
+  
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+      - "443:443"
+    #restart: always
+    volumes:
+      - /etc/quicksilvra/nginx/conf/:/etc/nginx/conf.d/:ro
+      - /etc/quicksilvra/certbot/www/:/var/www/certbot/:ro
+      - /etc/quicksilvra/certbot/conf/:/etc/nginx/ssl/:ro
+    networks:
+      - quicksilvra-network
+  
+  idp:
+    image: quicksilvra-idp-uat
+    expose:
+      - "5001"
+    environment:
+      ASPNETCORE_HTTP_PORTS: "5001"
+      ASPNETCORE_FORWARDEDHEADERS_ENABLED: true
+      DataProtectionConfiguration__x509__FileName: ${Quicksilvra_DataProtectionConfiguration__X509__FileName}
+      DataProtectionConfiguration__x509__Key: ${Quicksilvra_DataProtectionConfiguration__X509__Key}
+      DataProtectionConfiguration__X509__Path: ${Quicksilvra_DataProtectionConfiguration__X509__Path}
+      DataProtectionConfiguration__DataProtectionPath: ${Quicksilvra_DataProtectionConfiguration__DataProtectionPath}
+      NetworkConfiguration__AuthorityInternalUri: ${Quicksilvra_Uat_AuthorityInternalUri}
+      NetworkConfiguration__AuthorityExternalUri: ${Quicksilvra_Uat_AuthorityExternalUri}
+      DuendeIdentityServerLicence: ${DuendeIdentityServerLicence}
+    volumes:
+      - ${Quicksilvra_DataProtectionConfiguration__DataProtectionPath}:${Quicksilvra_DataProtectionConfiguration__DataProtectionPath}
+      - ${Quicksilvra_DataProtectionConfiguration__X509__Path}:${Quicksilvra_DataProtectionConfiguration__X509__Path}:ro
+    networks:
+      - quicksilvra-network 
+
+
+
+
+networks:
+  quicksilvra-network:
+    driver: bridge

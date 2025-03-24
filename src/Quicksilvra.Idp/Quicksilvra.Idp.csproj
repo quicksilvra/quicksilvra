@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+	<PropertyGroup>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+		<AnalysisMode>Default</AnalysisMode>
+	  <UserSecretsId>d9145f2c-c395-43ac-84df-781106a764a7</UserSecretsId>
+  </PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Duende.IdentityServer" />
+		<PackageReference Include="Serilog.AspNetCore" />
+		<PackageReference Include="FSharp.Core" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\Quicksilvra.Auth\Quicksilvra.Auth.fsproj" />
+	</ItemGroup>
+
+</Project>
