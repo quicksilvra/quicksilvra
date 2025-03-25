@@ -1,6 +1,7 @@
 #!/bin/bash
 
 set -e
+trap 'rm -f .env; exit' EXIT INT TERM
 
 echo "📢 Sourcing env from /etc/quicksilvra/quicksilvra-env.sh"
 source /etc/quicksilvra/quicksilvra-env.sh
@@ -30,5 +31,3 @@ docker compose -f docker-compose.yaml rm -f %%servicename%%
 
 echo "🚀 Starting new %%servicename%% container..."
 docker compose -f docker-compose.yaml up -d %%servicename%%
-
-trap 'rm -f .env; exit' EXIT
