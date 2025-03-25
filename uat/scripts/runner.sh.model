@@ -31,4 +31,4 @@ docker compose -f docker-compose.yaml rm -f %%servicename%%
 echo "🚀 Starting new %%servicename%% container..."
 docker compose -f docker-compose.yaml up -d %%servicename%%
 
-rm ./.env
+trap 'rm -f .env; exit' EXIT
