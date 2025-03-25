@@ -6,3 +6,8 @@ module Network =
         { Proxied: bool
           AuthorityInternalUri: string
           AuthorityExternalUri: string }
+
+    type ServiceNetworkConfiguration =
+        { ServiceInternalUri: string
+          ServiceExternalUri: string
+          IdpNetworkConfiguration: IdpNetworkConfiguration }

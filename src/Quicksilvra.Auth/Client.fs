@@ -42,8 +42,8 @@ module Client =
         proxied
         authorityInternalUri
         authorityExternalUri
-        webBffInternalUri
-        webBffExternalUri
+        serviceInternalUri
+        serviceExternalUri
         name
         id
         secret
@@ -61,20 +61,22 @@ module Client =
             HashedClientSecret = sha256 <| Some secret
             AllowOfflineAccess = true
             RedirectUris =
-                [| $"{webBffInternalUri}{callBackPath}"
-                   $"{webBffExternalUri}{callBackPath}" |]
+                [| $"{serviceInternalUri}{callBackPath}"
+                   $"{serviceExternalUri}{callBackPath}" |]
             SignOutCallBackPath = signOutCallBackPath
             SignedOutCallbackPaths =
-                [| $"{webBffInternalUri}{signOutCallBackPath}"
-                   $"{webBffExternalUri}{signOutCallBackPath}" |] }
+                [| $"{serviceInternalUri}{signOutCallBackPath}"
+                   $"{serviceExternalUri}{signOutCallBackPath}" |] }
 
 
 
     let create networkConfiguration name id secret =
         createCore
-            networkConfiguration.Proxied
-            networkConfiguration.AuthorityInternalUri
-            networkConfiguration.AuthorityExternalUri
+            networkConfiguration.IdpNetworkConfiguration.Proxied
+            networkConfiguration.IdpNetworkConfiguration.AuthorityInternalUri
+            networkConfiguration.IdpNetworkConfiguration.AuthorityExternalUri
+            networkConfiguration.ServiceInternalUri
+            networkConfiguration.ServiceExternalUri
             name
             id
             secret
