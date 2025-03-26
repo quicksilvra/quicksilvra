@@ -1,4 +1,8 @@
-﻿.welcome-page .logo {
+﻿body {
+  font-family: 'Comfortaa', sans-serif;
+}
+
+.welcome-page .logo {
   width: 64px;
 }
 
