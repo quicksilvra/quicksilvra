@@ -1,6 +1,23 @@
+.welcome-title {
+  font-family: 'Comfortaa', sans-serif;
+}
+
+.welcome-title-background-image {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  z-index: -1;
+  opacity: 0.2;
+}
+
 .welcome-page {
   .logo {
     width: 64px;
+  }
+  
+  li {
+    list-style: none;
+    padding: 4px;
   }
 }
 
@@ -13,12 +30,6 @@
   padding-bottom: 40px;
 }
 
-.welcome-page {
-  li {
-    list-style: none;
-    padding: 4px;
-  }
-}
 
 .logged-out-page {
   iframe {
