@@ -14,6 +14,7 @@ on:
         type: choice
         options:
           - all
+          - nginx
           - idp
       runner-labels:
         description: 'Runner labels (as JSON string, e.g. ["self-hosted", "build-runner"])'
@@ -44,6 +45,18 @@ jobs:
           echo "runners=$runners" >> $GITHUB_OUTPUT
           echo "Final values => service: $service, runners: $runners"
 
+
+  promote-nginx:
+    if: ${{ needs.set-defaults.outputs.service == 'all' || needs.set-defaults.outputs.service == 'nginx' }}
+    needs: [ set-defaults ]
+    uses: ./.github/workflows/shared-02-promote.yaml
+    with:
+      environment-name: 'uat'
+      service-name: 'nginx'
+      image-name: 'quicksilvra-nginx'
+      runner-labels: ${{ needs.set-defaults.outputs.runners }}
+      remote: "SENESCHAL"
+      build-share: "/mnt/buildshare/builds"
 
   promote-idp:
     if: ${{ needs.set-defaults.outputs.service == 'all' || needs.set-defaults.outputs.service == 'idp' }}

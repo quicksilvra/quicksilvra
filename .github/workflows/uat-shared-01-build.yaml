@@ -12,6 +12,7 @@ on:
         type: choice
         options:
           - all
+          - nginx
           - idp
       runner-labels:
         description: 'Runner labels (as JSON string, e.g. ["self-hosted", "build-runner"])'
@@ -51,6 +52,20 @@ jobs:
         run: |
           TIMESTAMP=$(date -u +"%Y%m%d-%H%M%SZ")
           echo "timestamp=$TIMESTAMP" >> $GITHUB_OUTPUT
+  
+
+  build-nginx:
+    if: ${{ github.event_name == 'push' || github.event.inputs.service-to-build == 'all' || github.event.inputs.service-to-build == 'nginx' }}
+    needs: [prepare-metadata, set-defaults]
+    uses: ./.github/workflows/shared-01-build.yaml
+    with:
+      environment-name: 'uat'
+      service-name: 'nginx'
+      image-name: 'quicksilvra-nginx'
+      dockerfile-name: 'DockerfileNginxUat'
+      runner-labels: ${{ needs.set-defaults.outputs.runners }}
+      timestamp: ${{ needs.prepare-metadata.outputs.timestamp }}
+      build-share: "/mnt/buildshare/builds"
   
   build-idp:
     if: ${{ github.event_name == 'push' || github.event.inputs.service-to-build == 'all' || github.event.inputs.service-to-build == 'idp' }}

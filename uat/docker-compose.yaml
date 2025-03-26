@@ -11,13 +11,12 @@ services:
       - quicksilvra-network
   
   nginx:
-    image: nginx:latest
+    image: nginx-uat
     ports:
       - "80:80"
       - "443:443"
     #restart: always
     volumes:
-      - /etc/quicksilvra/nginx/conf/:/etc/nginx/conf.d/:ro
       - /etc/quicksilvra/certbot/www/:/var/www/certbot/:ro
       - /etc/quicksilvra/certbot/conf/:/etc/nginx/ssl/:ro
     networks:
