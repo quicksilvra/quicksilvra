@@ -1,10 +1,15 @@
-body {
+.welcome-title {
   font-family: 'Comfortaa', sans-serif;
 }
 
 .welcome-page {
   .logo {
     width: 64px;
+  }
+  
+  li {
+    list-style: none;
+    padding: 4px;
   }
 }
 
@@ -17,12 +22,6 @@ body {
   padding-bottom: 40px;
 }
 
-.welcome-page {
-  li {
-    list-style: none;
-    padding: 4px;
-  }
-}
 
 .logged-out-page {
   iframe {

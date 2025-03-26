@@ -27,4 +27,6 @@ bootstrap.bundle.min.js
 
 Service/**/logs/*
 
-
+# these files are runtime generated and during build 
+/src/Quicksilvra.Idp/wwwroot/css/site.css
+/src/Quicksilvra.Idp/wwwroot/css/site.css.map

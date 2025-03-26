@@ -1,0 +1,16 @@
+{
+  "name": "quicksilvra-idp",
+  "version": "1.0.0",
+  "description": "Quicksilvra Identity Provider",
+  "main": "",
+  "scripts": {
+    "sass:build": "sass wwwroot/css/:wwwroot/css/",
+    "sass:watch": "sass --watch wwwroot/css/:wwwroot/css/",
+    "sass:build-prod": "sass --no-source-map wwwroot/css/:wwwroot/css/ --style compressed"
+  },
+  "author": "Stefano Cerruti",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "sass": "^1.86.0"
+  }
+}
