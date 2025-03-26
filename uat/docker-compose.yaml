@@ -11,7 +11,7 @@ services:
       - quicksilvra-network
   
   nginx:
-    image: nginx-uat
+    image: quicksilvra-nginx-uat
     ports:
       - "80:80"
       - "443:443"
