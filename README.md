@@ -1,4 +1,4 @@
-<p style="text-align:center">
+<p align="center">
   <img src="assets/spinningLogoFinal.gif" alt="Quicksilvra Logo" style="width:150px"/>
 </p>
 
