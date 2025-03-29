@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Quicksilvra.Idp", "Quicksil
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Quicksilvra.Auth", "Quicksilvra.Auth\Quicksilvra.Auth.fsproj", "{58D76728-444E-466C-8619-0D4E1439EEFB}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Quicksilvra.WebBff", "Quicksilvra.WebBff\Quicksilvra.WebBff.fsproj", "{FB9413B8-718F-4C0A-8BCC-D911CB3178CC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{58D76728-444E-466C-8619-0D4E1439EEFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{58D76728-444E-466C-8619-0D4E1439EEFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{58D76728-444E-466C-8619-0D4E1439EEFB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FB9413B8-718F-4C0A-8BCC-D911CB3178CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FB9413B8-718F-4C0A-8BCC-D911CB3178CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FB9413B8-718F-4C0A-8BCC-D911CB3178CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FB9413B8-718F-4C0A-8BCC-D911CB3178CC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
