@@ -1,5 +1,5 @@
 namespace Quicksilvra.WebBff
-#nowarn "20"
+
 open System
 open System.Threading.Tasks
 open Microsoft.AspNetCore.Builder
@@ -15,7 +15,7 @@ module Program =
 
         let builder = WebApplication.CreateBuilder(args)
 
-        builder.Services.AddControllers()
+        builder.Services.AddControllers() |> ignore
 
         let app = builder.Build()
 
