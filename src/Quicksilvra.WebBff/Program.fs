@@ -15,7 +15,6 @@ module Program =
 
         let builder = WebApplication.CreateBuilder(args)
 
-        builder.Services.AddControllers() |> ignore
 
         let app = builder.Build()
 
