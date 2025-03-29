@@ -1,0 +1,79 @@
+name: PROD - 01 - Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      service-to-build:
+        description: 'Select the service to build'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - nginx
+          - idp
+      runner-labels:
+        description: 'Runner labels (as JSON string, e.g. ["self-hosted", "build-runner"])'
+        required: true
+        default: '["self-hosted", "build-runner"]'
+
+
+
+jobs: 
+
+  set-defaults:
+    name: Set default runner labels
+    runs-on: ["self-hosted", "build-runner"]
+    outputs:
+      runners: ${{ steps.set.outputs.runners }}
+    steps:
+      - name: Set runner labels for push and dispatch
+        id: set
+        run: |
+          if [ "${{ github.event_name }}" = "push" ]; then
+            runners=$(jq -c -n '["self-hosted", "build-runner"]')
+          else
+            runners='${{ github.event.inputs.runner-labels }}'
+          fi
+          echo "runners=$runners" >> $GITHUB_OUTPUT
+          echo "presenting runners variable: $runners"
+
+  prepare-metadata:
+    name: Generate timestamp for staging
+    needs: set-defaults
+    runs-on: ["self-hosted", "build-runner"]
+    outputs:
+      timestamp: ${{ steps.generate.outputs.timestamp }}
+    steps:
+      - name: Generate timestamp
+        id: generate
+        run: |
+          TIMESTAMP=$(date -u +"%Y%m%d-%H%M%SZ")
+          echo "timestamp=$TIMESTAMP" >> $GITHUB_OUTPUT
+  
+
+  build-nginx:
+    if: ${{ github.event_name == 'push' || github.event.inputs.service-to-build == 'all' || github.event.inputs.service-to-build == 'nginx' }}
+    needs: [prepare-metadata, set-defaults]
+    uses: ./.github/workflows/shared-01-build.yaml
+    with:
+      environment-name: 'prod'
+      service-name: 'nginx'
+      image-name: 'quicksilvra-nginx'
+      dockerfile-name: 'DockerfileNginxProd'
+      runner-labels: ${{ needs.set-defaults.outputs.runners }}
+      timestamp: ${{ needs.prepare-metadata.outputs.timestamp }}
+      build-share: "/mnt/buildshare/builds"
+  
+  build-idp:
+    if: ${{ github.event_name == 'push' || github.event.inputs.service-to-build == 'all' || github.event.inputs.service-to-build == 'idp' }}
+    needs: [prepare-metadata, set-defaults]
+    uses: ./.github/workflows/shared-01-build.yaml
+    with:
+      environment-name: 'prod'
+      service-name: 'idp'
+      image-name: 'quicksilvra-idp'
+      dockerfile-name: 'DockerfileIdpProd'
+      runner-labels: ${{ needs.set-defaults.outputs.runners }}
+      timestamp: ${{ needs.prepare-metadata.outputs.timestamp }}
+      build-share: "/mnt/buildshare/builds"
