@@ -1,9 +1,6 @@
-
-<p style="text-align: center;">
-  <img src="assets/logo.png" alt="Quicksilvra Logo" style="width: 100px"/>
+<p style="text-align:center">
+  <img src="assets/spinningLogoFinal.gif" alt="Quicksilvra Logo" style="width:150px"/>
 </p>
-
-----
 
 # Quicksilvra Overview
 
