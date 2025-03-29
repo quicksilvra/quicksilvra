@@ -51,7 +51,7 @@ jobs:
       service-name: 'nginx'
       image-name: 'quicksilvra-nginx'
       runner-labels: ${{ needs.set-defaults.outputs.runners }}
-      remote: "SENESCHAL"
+      remote: "ILION"
       build-share: "/mnt/buildshare/builds"
 
   promote-idp:
@@ -63,5 +63,5 @@ jobs:
       service-name: 'idp'
       image-name: 'quicksilvra-idp'
       runner-labels: ${{ needs.set-defaults.outputs.runners }}
-      remote: "SENESCHAL"
+      remote: "ILION"
       build-share: "/mnt/buildshare/builds"
