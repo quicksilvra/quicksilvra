@@ -1,3 +1,10 @@
+
+<p style="text-align: center;">
+  <img src="assets/logo.png" alt="Quicksilvra Logo" style="width: 100px"/>
+</p>
+
+----
+
 # Quicksilvra Overview
 
 ## 🌐 Network Endpoints
