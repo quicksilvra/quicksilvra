@@ -8,44 +8,36 @@ RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
     && apt-get install -y nodejs \
     && node -v && npm -v
 
-# Copy solution and all source files
 COPY src/*.sln .
 COPY src/. .
-
-# Restore NuGet packages
 RUN dotnet restore
 
-# Move into the Quicksilvra.Idp project
 WORKDIR /source/Quicksilvra.Idp
-
-# Install npm dependencies
 RUN npm install
-
-# Generate production-ready CSS with SASS
 RUN npm run sass:build-prod
-
-# Publish the application
 RUN dotnet publish -c Release -o /app --no-restore /p:UseAppHost=false
 
-# ---- Final stage (hardened) ----
+# ---- Final stage ----
 FROM mcr.microsoft.com/dotnet/aspnet:9.0
 WORKDIR /app
 
-# Create non-root user for runtime
-RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser
+# Define build-time args with defaults
+ARG APP_UID=10000
+ARG APP_GID=39000
+ARG APP_USER=appuser
+ARG APP_GROUP=appgroup
 
-# Copy published app from build stage
+# Create group and user with provided UID/GID
+RUN addgroup --gid ${APP_GID} ${APP_GROUP} && \
+    adduser --system --uid ${APP_UID} --ingroup ${APP_GROUP} ${APP_USER}
+
+# Copy app and set permissions
 COPY --from=build /app ./
-
-# Reduce permission scope
-RUN chown -R appuser:appgroup /app \
-    && chmod -R 755 /app
+RUN chown -R ${APP_USER}:${APP_GROUP} /app && chmod -R 755 /app
 
 # Switch to non-root user
-USER appuser
+USER ${APP_USER}
 
-# Disable shell access (optional for stricter containers)
 SHELL ["/bin/false"]
 
-# Start the app
 ENTRYPOINT ["dotnet", "Quicksilvra.Idp.dll"]
