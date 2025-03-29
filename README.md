@@ -9,5 +9,6 @@ Env File /etc/quicksilvra/quicksilvra-env.sh
 
 Files in /opt/deploy
 
+#### Certbot ( both UAT and PROD )
 
-
+files in /etc/quicksilvra/certbot/
