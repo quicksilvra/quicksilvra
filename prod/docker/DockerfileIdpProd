@@ -1,20 +1,51 @@
-﻿FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+﻿# ---- Build stage ----
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /source
 
-COPY src/*.sln .
+# Install Node.js v22 LTS
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
+    && apt-get update \
+    && apt-get install -y nodejs \
+    && node -v && npm -v
 
+# Copy solution and all source files
+COPY src/*.sln .
 COPY src/. .
+
+# Restore NuGet packages
 RUN dotnet restore
 
-
+# Move into the Quicksilvra.Idp project
 WORKDIR /source/Quicksilvra.Idp
-RUN dotnet publish -c release -o /app --no-restore  /p:UseAppHost=false
 
+# Install npm dependencies
+RUN npm install
 
-# final stage/image
+# Generate production-ready CSS with SASS
+RUN npm run sass:build-prod
+
+# Publish the application
+RUN dotnet publish -c Release -o /app --no-restore /p:UseAppHost=false
+
+# ---- Final stage (hardened) ----
 FROM mcr.microsoft.com/dotnet/aspnet:9.0
 WORKDIR /app
+
+# Create non-root user for runtime
+RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser
+
+# Copy published app from build stage
 COPY --from=build /app ./
 
+# Reduce permission scope
+RUN chown -R appuser:appgroup /app \
+    && chmod -R 755 /app
 
-ENTRYPOINT ["dotnet", "Quicksilvra.Idp.dll"] 
+# Switch to non-root user
+USER appuser
+
+# Disable shell access (optional for stricter containers)
+SHELL ["/bin/false"]
+
+# Start the app
+ENTRYPOINT ["dotnet", "Quicksilvra.Idp.dll"]
