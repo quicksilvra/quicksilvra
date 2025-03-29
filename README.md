@@ -1,8 +1,7 @@
 <p align="center">
-  <img src="assets/logo.png" alt="Quicksilvra Logo" style="width:150px"/>
+  <img src="assets/name_and_logo.png" alt="Quicksilvra Logo" style="width:350px"/>
 </p>
 
-# Quicksilvra Overview
 
 ## 🌐 Network Endpoints
 
